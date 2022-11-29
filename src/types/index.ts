@@ -23,3 +23,8 @@ export type LaunchesSettings = {
   skip: number;
   hasMore: boolean;
 };
+
+export type LaunchQuery = {
+  name: string;
+  flight_number: string;
+};

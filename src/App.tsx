@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import styled from "styled-components";
 
-import { Launch, Launches, LaunchesSettings } from "types";
+import { Launch, Launches, LaunchesSettings, LaunchQuery } from "types";
 import { getLaunches } from "api/launch";
 import { useDebounce } from "customHooks";
 import config from "_config";
@@ -23,6 +23,10 @@ function App() {
     hasMore: true,
   });
 
+  const [query, setQuery] = useState<LaunchQuery>({
+    name: "",
+    flight_number: "",
+  });
   const [filter, setFilter] = useState<string>("");
 
   useEffect(() => {
@@ -30,12 +34,13 @@ function App() {
       const { list, nextPage } = await getLaunches({
         skip: 0,
         limit: config.launchesLimit,
+        query,
       });
       setLaunches(list);
       setSettings({ ...settings, hasMore: !!nextPage });
     }
     loadData();
-  }, []);
+  }, [query]);
 
   const fetchData = async () => {
     const { skip } = settings;
@@ -44,6 +49,7 @@ function App() {
     const { list, nextPage } = await getLaunches({
       skip: newSkip,
       limit: config.launchesLimit,
+      query,
     });
     setLaunches([...launches, ...list]);
     setSettings({ skip: newSkip, hasMore: !!nextPage });
@@ -58,6 +64,13 @@ function App() {
     setActiveLaunch(null);
     setModalOpen(false);
   };
+
+  const handleQueryChange = useDebounce(
+    (event: React.ChangeEvent<HTMLInputElement>, key: string) => {
+      setQuery({ ...query, [key]: event.target.value });
+    },
+    [query]
+  );
 
   const handleFilterChange = useDebounce(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +88,10 @@ function App() {
 
   return (
     <Wrapper>
-      <Filters onChange={handleFilterChange} />
+      <Filters
+        onChangeFilter={handleFilterChange}
+        onChangeQuery={handleQueryChange}
+      />
       <InfiniteScroll
         dataLength={fillteredList.length}
         next={fetchData}

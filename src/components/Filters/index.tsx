@@ -1,15 +1,33 @@
 import styled from "styled-components";
 
 type Props = {
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeFilter: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangeQuery: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    key: string
+  ) => void;
 };
 
-const Filters: React.FC<Props> = ({ onChange }) => {
+const Filters: React.FC<Props> = ({ onChangeFilter, onChangeQuery }) => {
   return (
     <Wrapper>
       <Title>Filters</Title>
       <div>
-        <input type="text" placeholder="Rocket Name" onChange={onChange} />
+        <input
+          type="text"
+          placeholder="Name"
+          onChange={(e) => onChangeQuery(e, "name")}
+        />
+        <input
+          type="text"
+          placeholder="Flight number"
+          onChange={(e) => onChangeQuery(e, "flight_number")}
+        />
+        <input
+          type="text"
+          placeholder="Rocket Name"
+          onChange={onChangeFilter}
+        />
       </div>
     </Wrapper>
   );
